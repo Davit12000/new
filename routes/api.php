@@ -4,6 +4,8 @@ use App\Http\Controllers\Api\ResetPasswordController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\BlogController;
+use App\Http\Controllers\CategoryController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -26,9 +28,11 @@ Route::group(['middleware' => 'guest'], function(){
 
 });
 Route::middleware('guest')->group(function () {
-    Route::post('/login', [AuthController::class, 'login']);
-    Route::post('/register', [AuthController::class, 'register']);
-    //* Route::post('/reset', [PasswordResetLinkController::class, 'store']);
-    Route::post('/reset', [ResetPasswordController::class, 'reset']);
-    Route::post('/new-password', [ResetPasswordController::class, 'store']);
+    
+});
+Route::group(['middleware' => 'auth:sanctum'], function () {
+Route::apiResources([
+    'blogs' => BlogController::class,
+    'categories' => CategoryController::class
+]);
 });

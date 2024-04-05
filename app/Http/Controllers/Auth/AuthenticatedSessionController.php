@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Models\User;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
 
 class AuthenticatedSessionController extends Controller
@@ -23,13 +25,26 @@ class AuthenticatedSessionController extends Controller
     /**
      * Handle an incoming authentication request.
      */
-    public function store(LoginRequest $request): RedirectResponse
+    public function store(LoginRequest $request)//*: RedirectResponse
     {
-        $request->authenticate();
+        
+        $data=$request->validated();
+        $user = User::where('email', $data['email'])->first();
+        if(!$user || !Hash::check($data['password'], $user->password)){
+        return response([
+        'message' => 'wrong email or password'
+        ], 401);
+        }
+        $token = $user-> createToken('webToken')->plainTextToken;
+        return response([
+            'user' => $user,
+            'token' => $token
+        ]);
+         /*$request->authenticate();
 
         $request->session()->regenerate();
 
-        return redirect()->intended(RouteServiceProvider::HOME);
+        return redirect()->intended(RouteServiceProvider::HOME);*/
     }
 
     /**
